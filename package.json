@@ -1,0 +1,18 @@
+{
+  "name": "nodeserviceforconcurrency",
+  "version": "1.0.0",
+  "description": "run some tiny functions",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsc && node dist/koa.js"
+  },
+  "author": "fan",
+  "license": "MIT",
+  "dependencies": {
+    "@types/koa": "^2.0.50",
+    "@types/koa-router": "^7.0.42",
+    "koa": "^2.8.2",
+    "koa-router": "^7.4.0",
+    "typescript": "^3.6.3"
+  }
+}
