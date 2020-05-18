@@ -11,8 +11,12 @@
   "dependencies": {
     "@types/koa": "^2.0.50",
     "@types/koa-router": "^7.0.42",
+    "@types/node-fetch": "^2.5.7",
+    "axios": "^0.19.2",
     "koa": "^2.8.2",
     "koa-router": "^7.4.0",
-    "typescript": "^3.6.3"
+    "node-fetch": "^2.6.0",
+    "typescript": "^3.6.3",
+    "v": "^0.3.0"
   }
 }
