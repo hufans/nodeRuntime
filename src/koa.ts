@@ -1,10 +1,116 @@
 import axios from 'axios';
+var colors = require('colors');
+
+export interface Column {
+  id: number;
+  code: number;
+  name: number;
+  lcp: number;
+  stp: number;
+  np: number;
+  ta: number;
+  tm: number;
+  hlp: number;
+  pl: number;
+  sl: number;
+  cat: number;
+  cot: number;
+  tr: number;
+  ape: number;
+  min5pl: number;
+}
+
+export interface Summary {
+  mstat: number;
+  pages: number;
+  page: number;
+  total: number;
+  hqtime: string;
+}
+enum codeType {
+  id = 0,
+  code = 1,
+  name = 2,
+  lcp = 3,
+  stp = 4,
+  np = 5,
+  ta = 6,
+  tm = 7,
+  hlp = 8,
+  pl = 9,
+  sl = 10,
+  cat = 11,
+  cot = 12,
+  tr = 13,
+  ape = 14,
+  min5pl = 15,
+}
+
+enum codeTypeChinese {
+  id = 'id',
+  code = 'code',
+  name = '名字',
+  lcp = '收盘价',
+  stp = '价',
+  np = '价',
+  ta = '总手',
+  tm = '金额',
+  hlp = '涨跌金额',
+  pl = '涨跌百分比',
+  sl = '震幅',
+  cat = '量比',
+  cot = '委比',
+  tr = '换手',
+  ape = '市盈',
+  min5pl = '未知',
+}
+
+export interface FiveMini {
+  Summary: Summary;
+  Column: codeTypeChinese;
+  HqData: any[][];
+}
+
+const EachConfig = (klist: any[]) => {
+  for (let index = 0; index < klist.length; index++) {
+    const k = klist[index];
+    if (k[8] > 3) {
+      console.log(k[8]);
+      return false;
+    }
+  }
+  return true;
+};
 
 const Start = async () => {
   const timeStamp = new Date().getTime();
   const fiveString = await FiveMinutesHot(timeStamp);
-  const hqa = eval(fiveString + '; hqa');
-  console.log(hqa);
+  const hqa: FiveMini = eval(fiveString + '; hqa');
+
+  const targetItem = hqa.HqData.slice(0, 3);
+
+  let stock: Promise<any>[] = [];
+
+  for (let index = 0; index < targetItem.length; index++) {
+    const item = targetItem[index];
+    if (item[13] < 3 && item[14] < 200) {
+      const a: string = item[0];
+      const code = a.toUpperCase();
+      stock.push(Each(code, timeStamp));
+    }
+  }
+  if (stock.length > 0) {
+    const allStock = await Promise.all(stock);
+
+    const result = allStock.map((klist) => [
+      EachConfig(klist.item),
+      klist.symbol,
+    ]);
+
+    result.map(
+      (res) => res[0] && console.log('\x1B[36m%s\x1B[0m', '找到了' + res[1])
+    );
+  }
 };
 
 const FiveMinutesHot = (timeStamp: number) => {
@@ -16,10 +122,10 @@ const FiveMinutesHot = (timeStamp: number) => {
     .then((res) => res.data);
 };
 
-const Each = (code) => {
+const Each = (code: string, timeStamp: number) =>
   axios
     .get(
-      'https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=SZ000651&begin=1589904255563&period=day&type=before&count=-3&indicator=kline,pe,pb,ps,pcf',
+      `https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=${code}&begin=${timeStamp}&period=day&type=before&count=-1&indicator=kline,pe,pb,ps,pcf`,
       {
         headers: {
           accept:
@@ -37,7 +143,6 @@ const Each = (code) => {
         method: 'GET',
       }
     )
-    .then((cc) => console.log(cc.data.data.item[0], '00000'))
-    .catch((e) => console.log(e));
-};
-Start();
+    .then((cc) => cc.data.data as any[]);
+
+setInterval(() => Start(), 2000);

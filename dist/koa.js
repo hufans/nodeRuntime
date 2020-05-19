@@ -37,8 +37,57 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
+var colors = require('colors');
+var codeType;
+(function (codeType) {
+    codeType[codeType["id"] = 0] = "id";
+    codeType[codeType["code"] = 1] = "code";
+    codeType[codeType["name"] = 2] = "name";
+    codeType[codeType["lcp"] = 3] = "lcp";
+    codeType[codeType["stp"] = 4] = "stp";
+    codeType[codeType["np"] = 5] = "np";
+    codeType[codeType["ta"] = 6] = "ta";
+    codeType[codeType["tm"] = 7] = "tm";
+    codeType[codeType["hlp"] = 8] = "hlp";
+    codeType[codeType["pl"] = 9] = "pl";
+    codeType[codeType["sl"] = 10] = "sl";
+    codeType[codeType["cat"] = 11] = "cat";
+    codeType[codeType["cot"] = 12] = "cot";
+    codeType[codeType["tr"] = 13] = "tr";
+    codeType[codeType["ape"] = 14] = "ape";
+    codeType[codeType["min5pl"] = 15] = "min5pl";
+})(codeType || (codeType = {}));
+var codeTypeChinese;
+(function (codeTypeChinese) {
+    codeTypeChinese["id"] = "id";
+    codeTypeChinese["code"] = "code";
+    codeTypeChinese["name"] = "\u540D\u5B57";
+    codeTypeChinese["lcp"] = "\u6536\u76D8\u4EF7";
+    codeTypeChinese["stp"] = "\u4EF7";
+    codeTypeChinese["np"] = "\u4EF7";
+    codeTypeChinese["ta"] = "\u603B\u624B";
+    codeTypeChinese["tm"] = "\u91D1\u989D";
+    codeTypeChinese["hlp"] = "\u6DA8\u8DCC\u91D1\u989D";
+    codeTypeChinese["pl"] = "\u6DA8\u8DCC\u767E\u5206\u6BD4";
+    codeTypeChinese["sl"] = "\u9707\u5E45";
+    codeTypeChinese["cat"] = "\u91CF\u6BD4";
+    codeTypeChinese["cot"] = "\u59D4\u6BD4";
+    codeTypeChinese["tr"] = "\u6362\u624B";
+    codeTypeChinese["ape"] = "\u5E02\u76C8";
+    codeTypeChinese["min5pl"] = "\u672A\u77E5";
+})(codeTypeChinese || (codeTypeChinese = {}));
+var EachConfig = function (klist) {
+    for (var index = 0; index < klist.length; index++) {
+        var k = klist[index];
+        if (k[8] > 3) {
+            console.log(k[8]);
+            return false;
+        }
+    }
+    return true;
+};
 var Start = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var timeStamp, fiveString, hqa;
+    var timeStamp, fiveString, hqa, targetItem, stock, index, item, a, code, allStock, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -47,8 +96,27 @@ var Start = function () { return __awaiter(void 0, void 0, void 0, function () {
             case 1:
                 fiveString = _a.sent();
                 hqa = eval(fiveString + '; hqa');
-                console.log(hqa);
-                return [2 /*return*/];
+                targetItem = hqa.HqData.slice(0, 3);
+                stock = [];
+                for (index = 0; index < targetItem.length; index++) {
+                    item = targetItem[index];
+                    if (item[13] < 3 && item[14] < 200) {
+                        a = item[0];
+                        code = a.toUpperCase();
+                        stock.push(Each(code, timeStamp));
+                    }
+                }
+                if (!(stock.length > 0)) return [3 /*break*/, 3];
+                return [4 /*yield*/, Promise.all(stock)];
+            case 2:
+                allStock = _a.sent();
+                result = allStock.map(function (klist) { return [
+                    EachConfig(klist.item),
+                    klist.symbol,
+                ]; });
+                result.map(function (res) { return res[0] && console.log('\x1B[36m%s\x1B[0m', '找到了' + res[1]); });
+                _a.label = 3;
+            case 3: return [2 /*return*/];
         }
     });
 }); };
@@ -58,9 +126,9 @@ var FiveMinutesHot = function (timeStamp) {
         timeStamp)
         .then(function (res) { return res.data; });
 };
-var Each = function (code) {
-    axios_1.default
-        .get('https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=SZ000651&begin=1589904255563&period=day&type=before&count=-3&indicator=kline,pe,pb,ps,pcf', {
+var Each = function (code, timeStamp) {
+    return axios_1.default
+        .get("https://stock.xueqiu.com/v5/stock/chart/kline.json?symbol=" + code + "&begin=" + timeStamp + "&period=day&type=before&count=-1&indicator=kline,pe,pb,ps,pcf", {
         headers: {
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'accept-language': 'en,zh-CN;q=0.9,zh;q=0.8,zh-TW;q=0.7',
@@ -74,8 +142,7 @@ var Each = function (code) {
         },
         method: 'GET',
     })
-        .then(function (cc) { return console.log(cc.data.data.item[0], '00000'); })
-        .catch(function (e) { return console.log(e); });
+        .then(function (cc) { return cc.data.data; });
 };
-Start();
+setInterval(function () { return Start(); }, 2000);
 //# sourceMappingURL=koa.js.map
