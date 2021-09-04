@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "ts",
-      "program": "${workspaceFolder}/src/koa.ts",
+      "program": "${workspaceFolder}/src/index.ts",
       "outFiles": ["${workspaceFolder}/**/*.js"]
     }
   ]

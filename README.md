@@ -10,3 +10,8 @@ it`s a typescript debug and example respository and nodejs is necessary。
 > press F5
 
 > enjoy
+
+
+# typescript online debug
+
+>>> default run index.ts file 
