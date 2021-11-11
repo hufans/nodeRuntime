@@ -14,5 +14,8 @@
     "koa": "^2.8.2",
     "koa-router": "^7.4.0",
     "typescript": "^3.6.3"
+  },
+  "devDependencies": {
+    "ts-node": "^10.4.0"
   }
 }
